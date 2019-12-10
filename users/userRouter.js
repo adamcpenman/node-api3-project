@@ -1,4 +1,5 @@
 const express = require('express');
+const db = require('./userDb')
 
 const router = express.Router();
 
@@ -11,15 +12,51 @@ router.post('/:id/posts', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-  // do your magic!
+  db.get(req.params.id)
+    .then(data => {
+      res.json(data)
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: "Could not get data"
+      })
+    })
 });
 
 router.get('/:id', (req, res) => {
-  // do your magic!
+  db.getById(req.params.id)
+    .then(data => {
+      if(data) {
+        res.json(data)
+      } else {
+        res.status(404).json({
+          message: "ID not found"
+        })
+      }
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: "Could not get ID "
+      })
+    })
 });
 
 router.get('/:id/posts', (req, res) => {
-  // do your magic!
+  db.getUserPosts(req.params.id)
+    .then(data => {
+      if (data) {
+        res.json(data)
+      } else {
+        res.status(404).json({
+          message: "ID Post not found"
+        })
+      }
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: "Info not found"
+      })
+    })
 });
 
 router.delete('/:id', (req, res) => {
