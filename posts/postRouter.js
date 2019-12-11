@@ -1,4 +1,5 @@
 const express = require('express');
+const dbPosts = require('./postDb')
 
 const router = express.Router();
 
@@ -20,8 +21,26 @@ router.put('/:id', (req, res) => {
 
 // custom middleware
 
-function validatePostId(req, res, next) {
-  // do your magic!
+function validateUserId(req, res, next) {
+ return (req, res, next) => {
+   dbPosts.getById(req.params.id)
+    .then(post => {
+      if (post) {
+        req.post = post
+        next()
+      } else {
+        res.status(404).json({
+           message: "Post not found!"
+        })
+      }
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: "Error retrieving Post"
+      })
+    })
+    next()
+ }
 }
 
 module.exports = router;
