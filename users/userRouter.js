@@ -4,11 +4,46 @@ const db = require('./userDb')
 const router = express.Router();
 
 router.post('/', (req, res) => {
-  // do your magic!
+  if (!req.body.name) {
+    res.status(400).json({
+      message: 'Provide a name of hobbit, elf, wizard, dwarf'
+    })
+  } else {
+    db.insert(req.body)
+      .then(post => {
+        res.status(201).json(post)
+      })
+      .catch(err => {
+        res.status(500).json({
+          error: "Could not save"
+        })
+      })
+  }
 });
 
 router.post('/:id/posts', (req, res) => {
-  // do your magic!
+  if (!req.body) {
+    res.status(400).json({
+      message: "please provide some Elvish"
+    })
+  }
+   const commentInfo = {text: req.body.text,
+   sender: req.body.sender};
+    db.getUserPosts(req.params.id, commentInfo)
+      .then(post => {
+        if (post) {
+        res.status(201).json({...post, ...req.body})
+        } else {
+          res.status(404).json({
+            message: 'The ID does not exisit'
+          })
+        }
+      })
+      .catch(err => {
+        res.status(500).json({
+          error: "Could not save"
+        })
+      })
 });
 
 router.get('/', (req, res) => {
@@ -60,11 +95,41 @@ router.get('/:id/posts', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  // do your magic!
+  db.remove(req.params.id)
+    .then(count => {
+        if (count > 0) {
+          res.status(200).json({ message: "BYE FOREVER"}) 
+        } else {
+          res.status(204).json({
+            message: "Could not delete"
+          })
+        }
+    })
+    .catch (err => {
+        console.log(error)
+        res.status(500).json({
+          message: "Error"
+        })
+    })
 });
 
 router.put('/:id', (req, res) => {
-  // do your magic!
+  if (!req.body.name) {
+    return res.status(400).json({message: "Missing Name"})
+  }
+    db.update(req.params.id, req.body)
+      .then(change => {
+        if (change) {
+          res.status(200).json(change)
+        } else {
+          res.status(404).json({ message: "Nothing can be found"})
+        }
+      })
+      .catch(err => {
+        res.status(500).json({
+          message: "Error Updating"
+        })
+      })
 });
 
 //custom middleware
