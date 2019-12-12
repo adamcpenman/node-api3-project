@@ -30,7 +30,7 @@ router.post('/', validateUser(), (req, res) => {
   //     })
   // }
 
-router.post('/:id/posts', validateUserId(), validatePost(), (req, res) => {
+router.post('/:id/posts', validatePost(), validateUserId(), (req, res) => {
   // do your magic!
     dbPosts.insert({ user_id: req.user.id, ...req.body })
       .then(post => res.status(201).json(post))
